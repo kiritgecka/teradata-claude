@@ -1,21 +1,22 @@
 import { anthropic } from "@/lib/anthropic";
-import { SYSTEM_PROMPT } from "@/lib/sql-prompts";
+import { buildSystemPrompt } from "@/lib/sql-prompts";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const teradataSQL: string = body?.teradata_sql ?? "";
+    const { teradata_sql, source_system = "Teradata", target_system = "Snowflake" } = body ?? {};
+    const sourceSQL: string = teradata_sql ?? "";
 
-    if (!teradataSQL.trim()) {
+    if (!sourceSQL.trim()) {
       return new Response(JSON.stringify({ error: "No SQL provided" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    if (teradataSQL.length > 50000) {
+    if (sourceSQL.length > 50000) {
       return new Response(JSON.stringify({ error: "SQL too large (max 50,000 characters)" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -25,11 +26,11 @@ export async function POST(req: Request) {
     const stream = anthropic.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: 4096,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(source_system, target_system),
       messages: [
         {
           role: "user",
-          content: `Convert this Teradata SQL to Snowflake SQL:\n\n${teradataSQL}`,
+          content: `Convert this ${source_system} SQL to ${target_system} SQL:\n\n${sourceSQL}`,
         },
       ],
     });

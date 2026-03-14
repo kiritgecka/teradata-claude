@@ -13,6 +13,7 @@ html,
 body {
   background: #07080F;
   color: #E2E8F0;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 /* Custom dark scrollbar */

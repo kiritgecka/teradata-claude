@@ -25,7 +25,7 @@ export default function ConvertButton({ onClick, loading, disabled }: ConvertBut
       ) : (
         <Zap className="w-4 h-4" />
       )}
-      {loading ? "Converting..." : "Convert to Snowflake"}
+      {loading ? "Converting..." : "Convert SQL"}
     </button>
   );
 }

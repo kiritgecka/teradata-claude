@@ -1,4 +1,25 @@
-export const SYSTEM_PROMPT = `You are an expert SQL migration specialist with deep knowledge of both Teradata and Snowflake SQL dialects.
+export const SUPPORTED_SYSTEMS = [
+  "Teradata",
+  "Snowflake",
+  "BigQuery",
+  "Azure Synapse",
+  "Databricks",
+  "Apache Spark/Hive",
+  "Amazon Redshift",
+  "IBM Db2 Warehouse",
+] as const;
+
+export const STORAGE_TYPES = [
+  "Cloud Data Warehouse",
+  "On-Premise Data Warehouse",
+  "Data Lake",
+  "Data Lakehouse",
+  "Cloud Object Storage",
+  "OLTP Database",
+  "Hybrid",
+] as const;
+
+const TERADATA_TO_SNOWFLAKE_PROMPT = `You are an expert SQL migration specialist with deep knowledge of both Teradata and Snowflake SQL dialects.
 Convert the provided Teradata SQL to valid, production-ready Snowflake SQL.
 
 STRICT RULES:
@@ -53,6 +74,27 @@ OUTPUT FORMAT:
 - Consistent 2-space or 4-space indentation
 - Snowflake-valid SQL only
 - No trailing semicolon unless the original had multiple statements`;
+
+export function buildSystemPrompt(source: string, target: string): string {
+  if (source === "Teradata" && target === "Snowflake") {
+    return TERADATA_TO_SNOWFLAKE_PROMPT;
+  }
+  return `You are an expert SQL migration specialist with deep knowledge of ${source} and ${target} SQL dialects.
+Convert the provided ${source} SQL to valid, production-ready ${target} SQL.
+
+STRICT RULES:
+1. Output ONLY the converted ${target} SQL. No explanations, no markdown code fences, no comments about the conversion.
+2. Preserve all business logic, aliases, joins, and calculated fields exactly.
+3. Use uppercase for all SQL keywords.
+4. Apply idiomatic ${target} syntax, functions, and best practices.
+5. Replace any ${source}-specific syntax, data types, and functions with their ${target} equivalents.
+
+OUTPUT FORMAT:
+- Uppercase SQL keywords
+- Consistent 4-space indentation
+- ${target}-valid SQL only
+- No trailing semicolon unless the original had multiple statements`;
+}
 
 export const DEFAULT_TERADATA_SQL = `REPLACE TABLE prod_db.customer_summary AS
 (

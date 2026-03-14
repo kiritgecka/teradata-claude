@@ -19,7 +19,7 @@ const config: Config = {
           cyan: "#00D4FF",
           orange: "#F97316",
           text: "#E2E8F0",
-          muted: "#6B7280",
+          muted: "#8B95B0",
         },
       },
       fontFamily: {
